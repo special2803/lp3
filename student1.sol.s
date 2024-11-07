@@ -1,64 +1,58 @@
-// SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StudentData {
-    // Define a structure to hold student details
-    struct Student {
+contract Studentdata{
+    struct Student{
         string name;
-        uint256 age;
+        uint age;
         string class;
-        uint256 rollNumber;
     }
-
-    // An array to hold all students
     Student[] public students;
+    
+    event StudentAdded(string name, string class);
 
-    // Event to log student data when added
-    event StudentAdded(string name, uint256 rollNumber);
-
-    // Event to log Ether received in the fallback function
     event FallbackCalled(address sender, uint256 amount, string message);
 
-    // Function to add a new student
-    function addStudent(string memory _name, uint256 _age, string memory _class, uint256 _rollNumber) public {
+    function addStudent(string memory _name, uint _age, string memory _class ) public{
         Student memory newStudent = Student({
             name: _name,
             age: _age,
-            class: _class,
-            rollNumber: _rollNumber
+            class: _class
         });
-        
         students.push(newStudent);
-
-        // Emit an event to log the new student addition
-        emit StudentAdded(_name, _rollNumber);
+        emit StudentAdded(_name, _class);
     }
 
-    // Function to retrieve the total number of students
-    function getTotalStudents() public view returns (uint256) {
+    function getTotalStudent()public view returns(uint){
         return students.length;
     }
 
-    // Function to retrieve a student's details by index
-    function getStudent(uint256 index) public view returns (string memory, uint256, string memory, uint256) {
+
+    function getStudent(uint index)public view returns(string memory, uint, string memory){
         require(index < students.length, "Invalid index");
         Student memory student = students[index];
-        return (student.name, student.age, student.class, student.rollNumber);
+        return (student.name, student.age, student.class);
     }
 
-    // Fallback function to handle unexpected calls or when there is data but no matching function
-    fallback() external payable {
-        // Emit an event to log the Ether received and a thank-you message
-        emit FallbackCalled(msg.sender, msg.value, "Thank you for sending Ether!");
+    function getAllStudents() public view returns (string[] memory, uint[] memory, string[] memory) {
+    uint length = students.length;
+    
+    string[] memory names = new string[](length);
+    uint[] memory ages = new uint[](length);
+    string[] memory classes = new string[](length);
+    
+    for (uint i = 0; i < length; i++) {
+        names[i] = students[i].name;
+        ages[i] = students[i].age;
+        classes[i] = students[i].class;
+    }
+    
+    return (names, ages, classes);
     }
 
-    // Receive function to handle plain Ether transfers with no data
-    receive() external payable {
-        // Any Ether sent without data will be accepted here
+    fallback() external  payable{
+        emit FallbackCalled(msg.sender, msg.value, "thank you for using");
     }
-
-    // Function to check the balance of Ether in the contract
-    function getContractBalance() public view returns (uint256) {
-        return address(this).balance;
+    receive() external payable { 
     }
 }
